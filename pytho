@@ -1,0 +1,87 @@
+from flask import Flask, render_template, request, redirect, url_for
+import sqlite3
+
+app = Flask(_name_)
+
+# Database setup
+DATABASE = 'wedding_traditions.db'
+
+
+def init_db():
+    with sqlite3.connect(DATABASE) as conn:
+        cursor = conn.cursor()
+        cursor.execute('''CREATE TABLE IF NOT EXISTS traditions (
+                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            name TEXT NOT NULL,
+                            description TEXT NOT NULL)''')
+        conn.commit()
+
+
+# Home route: Display all traditions
+@app.route("/")
+def index():
+    with sqlite3.connect(DATABASE) as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM traditions")
+        traditions = cursor.fetchall()
+    return render_template("index.html", traditions=traditions)
+
+
+# Add a new tradition
+@app.route("/add", methods=["GET", "POST"])
+def add_tradition():
+    if request.method == "POST":
+        name = request.form["name"]
+        description = request.form["description"]
+        with sqlite3.connect(DATABASE) as conn:
+            cursor = conn.cursor()
+            cursor.execute("INSERT INTO traditions (name, description) VALUES (?, ?)", (name, description))
+            conn.commit()
+        return redirect(url_for("index"))
+    return render_template("add.html")
+
+
+# Edit an existing tradition
+@app.route("/edit/<int:tradition_id>", methods=["GET", "POST"])
+def edit_tradition(tradition_id):
+    with sqlite3.connect(DATABASE) as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM traditions WHERE id = ?", (tradition_id,))
+        tradition = cursor.fetchone()
+    if request.method == "POST":
+        name = request.form["name"]
+        description = request.form["description"]
+        with sqlite3.connect(DATABASE) as conn:
+            cursor = conn.cursor()
+            cursor.execute("UPDATE traditions SET name = ?, description = ? WHERE id = ?", (name, description, tradition_id))
+            conn.commit()
+        return redirect(url_for("index"))
+    return render_template("edit.html", tradition=tradition)
+
+
+# Delete a tradition
+@app.route("/delete/<int:tradition_id>", methods=["POST"])
+def delete_tradition(tradition_id):
+    with sqlite3.connect(DATABASE) as conn:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM traditions WHERE id = ?", (tradition_id,))
+        conn.commit()
+    return redirect(url_for("index"))
+
+
+# Search for traditions
+@app.route("/search", methods=["GET", "POST"])
+def search():
+    if request.method == "POST":
+        query = request.form["query"]
+        with sqlite3.connect(DATABASE) as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM traditions WHERE name LIKE ? OR description LIKE ?", (f"%{query}%", f"%{query}%"))
+            results = cursor.fetchall()
+        return render_template("search.html", results=results, query=query)
+    return render_template("search.html", results=[], query="")
+
+
+if _name_ == "_main_":
+    init_db()
+    app.run(debug=True)

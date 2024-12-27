@@ -1,0 +1,152 @@
+public class Book {
+    private String title;
+    private String author;
+    private boolean isAvailable;
+
+    public Book(String title, String author) {
+        this.title = title;
+        this.author = author;
+        this.isAvailable = true;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public boolean isAvailable() {
+        return isAvailable;
+    }
+
+    public void setAvailability(boolean availability) {
+        isAvailable = availability;
+    }
+}
+
+
+Member.java
+
+public class Member {
+    private String name;
+    private String membershipId;
+    private List<Book> borrowedBooks;
+
+    public Member(String name, String membershipId) {
+        this.name = name;
+        this.membershipId = membershipId;
+        this.borrowedBooks = new ArrayList<>();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getMembershipId() {
+        return membershipId;
+    }
+
+    public List<Book> getBorrowedBooks() {
+        return borrowedBooks;
+    }
+
+    public void borrowBook(Book book) {
+        borrowedBooks.add(book);
+    }
+
+    public void returnBook(Book book) {
+        borrowedBooks.remove(book);
+    }
+}
+
+
+Library.java
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Library {
+    private List<Book> books;
+    private List<Member> members;
+
+    public Library() {
+        books = new ArrayList<>();
+        members = new ArrayList<>();
+    }
+
+    public void addBook(Book book) {
+        books.add(book);
+    }
+
+    public void addMember(Member member) {
+        members.add(member);
+    }
+
+    public void borrowBook(Member member, Book book) {
+        if (book.isAvailable()) {
+            member.borrowBook(book);
+            book.setAvailability(false);
+            System.out.println("Book borrowed successfully.");
+        } else {
+            System.out.println("Book is not available.");
+        }
+    }
+
+    public void returnBook(Member member, Book book) {
+        member.returnBook(book);
+        book.setAvailability(true);
+        System.out.println("Book returned successfully.");
+    }
+
+    public void printBooks() {
+        for (Book book : books) {
+            System.out.println("Title: " + book.getTitle());
+            System.out.println("Author: " + book.getAuthor());
+            System.out.println("Availability: " + book.isAvailable());
+            System.out.println();
+        }
+    }
+
+    public void printMembers() {
+        for (Member member : members) {
+            System.out.println("Name: " + member.getName());
+            System.out.println("Membership ID: " + member.getMembershipId());
+            System.out.println("Borrowed Books: " + member.getBorrowedBooks().size());
+            System.out.println();
+        }
+    }
+}
+
+
+Main.java
+
+public class Main {
+    public static void main(String[] args) {
+        Library library = new Library();
+
+        Book book1 = new Book("Book 1", "Author 1");
+        Book book2 = new Book("Book 2", "Author 2");
+
+        Member member1 = new Member("Member 1", "M1");
+        Member member2 = new Member("Member 2", "M2");
+
+        library.addBook(book1);
+        library.addBook(book2);
+
+        library.addMember(member1);
+        library.addMember(member2);
+
+        library.borrowBook(member1, book1);
+        library.borrowBook(member2, book2);
+
+        library.printBooks();
+        library.printMembers();
+
+        library.returnBook(member1, book1);
+
+        library.printBooks();
+        library.printMembers();
+    }
+}

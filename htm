@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mana Telugu Pellilu</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <h1>Mana Telugu Pellilu</h1>
+    <h2>Wedding Traditions</h2>
+    <a href="/add" class="button">Add Tradition</a>
+    <form method="POST" action="/search">
+        <input type="text" name="query" placeholder="Search traditions...">
+        <button type="submit">Search</button>
+    </form>
+    <ul>
+        {% for tradition in traditions %}
+        <li>
+            <strong>{{ tradition[1] }}</strong>: {{ tradition[2] }}
+            <a href="/edit/{{ tradition[0] }}">Edit</a>
+            <form action="/delete/{{ tradition[0] }}" method="POST" style="display:inline;">
+                <button type="submit">Delete</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

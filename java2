@@ -1,0 +1,131 @@
+public abstract class Account {
+    protected int accountNumber;
+    protected double balance;
+
+    public Account(int accountNumber, double balance) {
+        this.accountNumber = accountNumber;
+        this.balance = balance;
+    }
+
+    public int getAccountNumber() {
+        return accountNumber;
+    }
+
+    public double getBalance() {
+        return balance;
+    }
+
+    public abstract void deposit(double amount);
+
+    public abstract void withdraw(double amount);
+}
+
+
+SavingsAccount.java
+
+public class SavingsAccount extends Account {
+    private double interestRate;
+
+    public SavingsAccount(int accountNumber, double balance, double interestRate) {
+        super(accountNumber, balance);
+        this.interestRate = interestRate;
+    }
+
+    @Override
+    public void deposit(double amount) {
+        balance += amount;
+        System.out.println("Deposited $" + amount + " into savings account.");
+    }
+
+    @Override
+    public void withdraw(double amount) {
+        if (balance >= amount) {
+            balance -= amount;
+            System.out.println("Withdrew $" + amount + " from savings account.");
+        } else {
+            System.out.println("Insufficient funds.");
+        }
+    }
+
+    public void addInterest() {
+        double interest = balance * interestRate / 100;
+        balance += interest;
+        System.out.println("Added $" + interest + " interest to savings account.");
+    }
+}
+
+
+CheckingAccount.java
+
+public class CheckingAccount extends Account {
+    private double overdraftLimit;
+
+    public CheckingAccount(int accountNumber, double balance, double overdraftLimit) {
+        super(accountNumber, balance);
+        this.overdraftLimit = overdraftLimit;
+    }
+
+    @Override
+    public void deposit(double amount) {
+        balance += amount;
+        System.out.println("Deposited $" + amount + " into checking account.");
+    }
+
+    @Override
+    public void withdraw(double amount) {
+        if (balance + overdraftLimit >= amount) {
+            balance -= amount;
+            System.out.println("Withdrew $" + amount + " from checking account.");
+        } else {
+            System.out.println("Insufficient funds.");
+        }
+    }
+}
+
+
+Bank.java
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Bank {
+    private List<Account> accounts;
+
+    public Bank() {
+        accounts = new ArrayList<>();
+    }
+
+    public void addAccount(Account account) {
+        accounts.add(account);
+    }
+
+    public void printAccounts() {
+        for (Account account : accounts) {
+            System.out.println("Account Number: " + account.getAccountNumber());
+            System.out.println("Balance: $" + account.getBalance());
+            System.out.println();
+        }
+    }
+}
+
+
+Main.java
+
+public class Main {
+    public static void main(String[] args) {
+        Bank bank = new Bank();
+
+        SavingsAccount savingsAccount = new SavingsAccount(1234, 1000.0, 2.0);
+        CheckingAccount checkingAccount = new CheckingAccount(5678, 500.0, 1000.0);
+
+        bank.addAccount(savingsAccount);
+        bank.addAccount(checkingAccount);
+
+        savingsAccount.deposit(500.0);
+        checkingAccount.withdraw(200.0);
+
+        savingsAccount.addInterest();
+
+        bank.printAccounts();
+    }
+}
